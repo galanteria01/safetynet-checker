@@ -5,11 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.safetynet.SafetyNet
+import com.shanu.safetynetchecker.R
 import com.shanu.safetynetchecker.databinding.FragmentRequestBinding
 import com.shanu.safetynetchecker.util.API_KEY
 import java.io.ByteArrayOutputStream
@@ -51,7 +54,7 @@ class Request : Fragment() {
         ) {
             sendSafetynetRequest()
         } else {
-            // Prompt user to update Google Play Services.
+            Toast.makeText(context,"Update your Google Play Services",Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -62,10 +65,11 @@ class Request : Fragment() {
         val nonce = getRequestNonce(noonceData)
 
         // Sending the request
-        SafetyNet.getClient(activity).attest(nonce, API_KEY)
+        SafetyNet.getClient(activity).attest(nonce!!, API_KEY)
             .addOnSuccessListener {
                 Log.d("data", it.jwsResult!!)
-                print(it.jwsResult!!)
+                print(it.jwsResult)
+                findNavController().navigate(R.id.action_request_fragment_to_result_fragment)
             }
             .addOnFailureListener{
                 if(it is ApiException) {
