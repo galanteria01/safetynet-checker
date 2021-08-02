@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@+id/request_fragment">
+    <fragment
+        android:id="@+id/request_fragment"
+        android:name="com.shanu.safetynetchecker.ui.Request"
+        android:label="Safetynet Request"
+        tools:layout="@layout/fragment_request"
+        >
+        <action
+            android:id="@+id/action_request_fragment_to_result_fragment"
+            app:destination="@id/result_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/result_fragment"
+        android:name="com.shanu.safetynetchecker.ui.Result"
+        android:label="Safetynet Result"
+        tools:layout="@layout/fragment_result"
+        >
+        <action
+            android:id="@+id/action_result_fragment_to_request_fragment"
+            app:destination="@id/request_fragment" />
+    </fragment>
+
+
+</navigation>
