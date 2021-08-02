@@ -1,10 +1,12 @@
 package com.shanu.safetynetchecker.ui
 
 import android.os.Bundle
+import android.util.Base64.DEFAULT
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil.decode
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -12,6 +14,8 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.safetynet.SafetyNet
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.json.webtoken.JsonWebSignature
 import com.shanu.safetynetchecker.R
 import com.shanu.safetynetchecker.databinding.FragmentRequestBinding
 import com.shanu.safetynetchecker.util.API_KEY
@@ -61,7 +65,7 @@ class Request : Fragment() {
     private fun sendSafetynetRequest() {
 
         // Generating the nonce
-        var noonceData = "Safety Net Data: " + System.currentTimeMillis()
+        val noonceData = "Safety Net Data: " + System.currentTimeMillis()
         val nonce = getRequestNonce(noonceData)
 
         // Sending the request
@@ -69,6 +73,9 @@ class Request : Fragment() {
             .addOnSuccessListener {
                 Log.d("data", it.jwsResult!!)
                 print(it.jwsResult)
+                val jws:JsonWebSignature = decodeJws(it.jwsResult!!)
+                Log.d("data", jws.payload["apkPackageName"].toString())
+                print(jws.payload)
                 findNavController().navigate(R.id.action_request_fragment_to_result_fragment)
             }
             .addOnFailureListener{
@@ -80,6 +87,18 @@ class Request : Fragment() {
                     Log.d("data", it.message.toString())
                 }
             }
+    }
+
+    private fun decodeJws(jwsResult:String): JsonWebSignature {
+        var jws: JsonWebSignature? = null
+        try {
+            jws = JsonWebSignature.parser(JacksonFactory.getDefaultInstance())
+                .parse(jwsResult)
+            return jws!!
+        } catch (e: IOException) {
+            Log.i("data", "Failure: "  + " is not valid JWS ")
+            return jws!!
+        }
     }
 
     private fun getRequestNonce(data: String): ByteArray? {
