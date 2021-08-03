@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil.decode
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.ApiException
@@ -29,6 +31,7 @@ class Request : Fragment() {
     private val binding get() = _binding!!
 
     private val mRandom: Random = SecureRandom()
+    val args: ResultArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +46,7 @@ class Request : Fragment() {
 
         binding.btnStatus.setOnClickListener {
             checkGoogleApi()
+            binding.btnStatus.isClickable = false
         }
     }
 
@@ -71,12 +75,11 @@ class Request : Fragment() {
         // Sending the request
         SafetyNet.getClient(activity).attest(nonce!!, API_KEY)
             .addOnSuccessListener {
-                Log.d("data", it.jwsResult!!)
-                print(it.jwsResult)
                 val jws:JsonWebSignature = decodeJws(it.jwsResult!!)
                 Log.d("data", jws.payload["apkPackageName"].toString())
-                print(jws.payload)
-                findNavController().navigate(R.id.action_request_fragment_to_result_fragment)
+                binding.btnStatus.isClickable = true
+                val bundle = bundleOf("result" to jws.payload["apkPackageName"])
+                findNavController().navigate(R.id.action_request_fragment_to_result_fragment, bundle)
             }
             .addOnFailureListener{
                 if(it is ApiException) {
