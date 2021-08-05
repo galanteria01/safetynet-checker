@@ -19,10 +19,7 @@ class Result : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.evaluationText.text = data.evaluationType
-        binding.basicIntegrityText.text = data.basicIntegrity
-        binding.profileMatchText.text = data.profileMatch
-
+        displayData()
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +33,12 @@ class Result : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun displayData() {
+        binding.evaluationText.text = data.evaluationType
+        binding.basicIntegrityText.text = data.basicIntegrity
+        binding.profileMatchText.text = data.profileMatch
     }
 
 }

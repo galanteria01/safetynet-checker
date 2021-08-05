@@ -28,11 +28,10 @@ import java.security.SecureRandom
 import java.util.*
 
 class Request : Fragment() {
+
     private var _binding: FragmentRequestBinding? = null
     private val binding get() = _binding!!
-
     private val mRandom: Random = SecureRandom()
-    val args: ResultArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +66,6 @@ class Request : Fragment() {
     }
 
     private fun sendSafetynetRequest() {
-
         // Generating the nonce
         val noonceData = "Safety Net Data: " + System.currentTimeMillis()
         val nonce = getRequestNonce(noonceData)
@@ -89,7 +87,7 @@ class Request : Fragment() {
             .addOnFailureListener{
                 if(it is ApiException) {
                     val apiException = it as ApiException
-                    Log.d("data",it.message.toString() )
+                    Log.d("data",apiException.message.toString() )
 
                 }else {
                     Log.d("data", it.message.toString())
@@ -104,7 +102,6 @@ class Request : Fragment() {
                 .parse(jwsResult)
             return jws!!
         } catch (e: IOException) {
-            Log.i("data", "Failure: "  + " is not valid JWS ")
             return jws!!
         }
     }
