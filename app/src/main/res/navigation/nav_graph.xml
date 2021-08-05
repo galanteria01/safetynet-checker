@@ -25,8 +25,8 @@
             android:id="@+id/action_result_fragment_to_request_fragment"
             app:destination="@id/request_fragment" />
         <argument
-            android:name="result"
-            app:argType="string" />
+            android:name="data"
+            app:argType="com.shanu.safetynetchecker.model.SafetynetResultModel" />
     </fragment>
 
 

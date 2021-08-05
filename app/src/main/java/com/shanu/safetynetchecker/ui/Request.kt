@@ -20,6 +20,7 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.client.json.webtoken.JsonWebSignature
 import com.shanu.safetynetchecker.R
 import com.shanu.safetynetchecker.databinding.FragmentRequestBinding
+import com.shanu.safetynetchecker.model.SafetynetResultModel
 import com.shanu.safetynetchecker.util.API_KEY
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -46,7 +47,6 @@ class Request : Fragment() {
 
         binding.btnStatus.setOnClickListener {
             checkGoogleApi()
-            binding.btnStatus.isClickable = false
         }
     }
 
@@ -77,9 +77,14 @@ class Request : Fragment() {
             .addOnSuccessListener {
                 val jws:JsonWebSignature = decodeJws(it.jwsResult!!)
                 Log.d("data", jws.payload["apkPackageName"].toString())
+                val data = SafetynetResultModel(
+                    basicIntegrity = jws.payload["basicIntegrity"].toString(),
+                    evaluationType = jws.payload["evaluationType"].toString(),
+                    profileMatch = jws.payload["ctsProfileMatch"].toString()
+                )
                 binding.btnStatus.isClickable = true
-                val bundle = bundleOf("result" to jws.payload["apkPackageName"])
-                findNavController().navigate(R.id.action_request_fragment_to_result_fragment, bundle)
+                val directions = RequestDirections.actionRequestFragmentToResultFragment(data)
+                findNavController().navigate(directions)
             }
             .addOnFailureListener{
                 if(it is ApiException) {
